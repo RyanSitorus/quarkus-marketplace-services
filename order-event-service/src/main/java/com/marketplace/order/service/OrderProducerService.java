@@ -8,6 +8,7 @@ import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.jboss.logging.Logger;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @ApplicationScoped
 public class OrderProducerService {
@@ -19,6 +20,9 @@ public class OrderProducerService {
     Emitter<RawOrderEvent> rawOrderEmitter;
 
     public void publishRawOrder(RawOrderEvent event) {
+        if (event.getOrderId() == null || event.getOrderId().isBlank()) {
+            event.setOrderId("ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+        }
         if (event.getEventTimestamp() == null) {
             event.setEventTimestamp(Instant.now());
         }

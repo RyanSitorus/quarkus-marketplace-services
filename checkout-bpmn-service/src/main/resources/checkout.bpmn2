@@ -1,0 +1,452 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                   xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                   xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                   xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                   xmlns:drools="http://www.jboss.org/drools"
+                   id="Definitions_Checkout"
+                   targetNamespace="http://www.omg.org/bpmn20"
+                   expressionLanguage="http://www.mvel.org/2.0"
+                   typeLanguage="http://www.java.com/javaTypes">
+
+    <bpmn2:itemDefinition id="_orderItem" structureRef="com.marketplace.checkout.model.CheckoutOrder"/>
+
+    <bpmn2:itemDefinition id="_ReserveStock_ParamItem" structureRef="com.marketplace.checkout.model.CheckoutOrder"/>
+    <bpmn2:itemDefinition id="_ReserveStock_ResultItem" structureRef="com.marketplace.checkout.model.CheckoutOrder"/>
+    <bpmn2:itemDefinition id="_CalculatePricing_ParamItem" structureRef="com.marketplace.checkout.model.CheckoutOrder"/>
+    <bpmn2:itemDefinition id="_CalculatePricing_ResultItem" structureRef="com.marketplace.checkout.model.CheckoutOrder"/>
+    <bpmn2:itemDefinition id="_ProcessPayment_ParamItem" structureRef="com.marketplace.checkout.model.CheckoutOrder"/>
+    <bpmn2:itemDefinition id="_ProcessPayment_ResultItem" structureRef="com.marketplace.checkout.model.CheckoutOrder"/>
+    <bpmn2:itemDefinition id="_ConfirmOrder_ParamItem" structureRef="com.marketplace.checkout.model.CheckoutOrder"/>
+    <bpmn2:itemDefinition id="_ConfirmOrder_ResultItem" structureRef="com.marketplace.checkout.model.CheckoutOrder"/>
+    <bpmn2:itemDefinition id="_ReleaseStock_ParamItem" structureRef="com.marketplace.checkout.model.CheckoutOrder"/>
+    <bpmn2:itemDefinition id="_ReleaseStock_ResultItem" structureRef="com.marketplace.checkout.model.CheckoutOrder"/>
+    <bpmn2:itemDefinition id="_NotifyOutOfStock_ParamItem" structureRef="com.marketplace.checkout.model.CheckoutOrder"/>
+    <bpmn2:itemDefinition id="_NotifyOutOfStock_ResultItem" structureRef="com.marketplace.checkout.model.CheckoutOrder"/>
+    <bpmn2:itemDefinition id="_NotifyPaymentFailed_ParamItem" structureRef="com.marketplace.checkout.model.CheckoutOrder"/>
+    <bpmn2:itemDefinition id="_NotifyPaymentFailed_ResultItem" structureRef="com.marketplace.checkout.model.CheckoutOrder"/>
+
+    <bpmn2:message id="_Msg_ReserveStock_In" name="reserveStock_In" itemRef="_ReserveStock_ParamItem"/>
+    <bpmn2:message id="_Msg_ReserveStock_Out" name="reserveStock_Out" itemRef="_ReserveStock_ResultItem"/>
+    <bpmn2:message id="_Msg_ReleaseStock_In" name="releaseStock_In" itemRef="_ReleaseStock_ParamItem"/>
+    <bpmn2:message id="_Msg_ReleaseStock_Out" name="releaseStock_Out" itemRef="_ReleaseStock_ResultItem"/>
+    <bpmn2:message id="_Msg_CalculatePricing_In" name="calculatePricing_In" itemRef="_CalculatePricing_ParamItem"/>
+    <bpmn2:message id="_Msg_CalculatePricing_Out" name="calculatePricing_Out" itemRef="_CalculatePricing_ResultItem"/>
+    <bpmn2:message id="_Msg_ProcessPayment_In" name="processPayment_In" itemRef="_ProcessPayment_ParamItem"/>
+    <bpmn2:message id="_Msg_ProcessPayment_Out" name="processPayment_Out" itemRef="_ProcessPayment_ResultItem"/>
+    <bpmn2:message id="_Msg_ConfirmOrder_In" name="confirmOrder_In" itemRef="_ConfirmOrder_ParamItem"/>
+    <bpmn2:message id="_Msg_ConfirmOrder_Out" name="confirmOrder_Out" itemRef="_ConfirmOrder_ResultItem"/>
+    <bpmn2:message id="_Msg_NotifyRejection_In" name="notifyRejection_In" itemRef="_NotifyOutOfStock_ParamItem"/>
+    <bpmn2:message id="_Msg_NotifyRejection_Out" name="notifyRejection_Out" itemRef="_NotifyOutOfStock_ResultItem"/>
+
+    <bpmn2:interface id="_Interface_InventoryService"
+                     name="com.marketplace.checkout.service.InventoryService"
+                     implementationRef="com.marketplace.checkout.service.InventoryService">
+        <bpmn2:operation id="_Op_ReserveStock" name="reserveStock" implementationRef="reserveStock">
+            <bpmn2:inMessageRef>_Msg_ReserveStock_In</bpmn2:inMessageRef>
+            <bpmn2:outMessageRef>_Msg_ReserveStock_Out</bpmn2:outMessageRef>
+        </bpmn2:operation>
+        <bpmn2:operation id="_Op_ReleaseStock" name="releaseStock" implementationRef="releaseStock">
+            <bpmn2:inMessageRef>_Msg_ReleaseStock_In</bpmn2:inMessageRef>
+            <bpmn2:outMessageRef>_Msg_ReleaseStock_Out</bpmn2:outMessageRef>
+        </bpmn2:operation>
+    </bpmn2:interface>
+
+    <bpmn2:interface id="_Interface_PricingService"
+                     name="com.marketplace.checkout.service.PricingService"
+                     implementationRef="com.marketplace.checkout.service.PricingService">
+        <bpmn2:operation id="_Op_CalculatePricing" name="calculatePricing" implementationRef="calculatePricing">
+            <bpmn2:inMessageRef>_Msg_CalculatePricing_In</bpmn2:inMessageRef>
+            <bpmn2:outMessageRef>_Msg_CalculatePricing_Out</bpmn2:outMessageRef>
+        </bpmn2:operation>
+    </bpmn2:interface>
+
+    <bpmn2:interface id="_Interface_PaymentService"
+                     name="com.marketplace.checkout.service.PaymentService"
+                     implementationRef="com.marketplace.checkout.service.PaymentService">
+        <bpmn2:operation id="_Op_ProcessPayment" name="processPayment" implementationRef="processPayment">
+            <bpmn2:inMessageRef>_Msg_ProcessPayment_In</bpmn2:inMessageRef>
+            <bpmn2:outMessageRef>_Msg_ProcessPayment_Out</bpmn2:outMessageRef>
+        </bpmn2:operation>
+    </bpmn2:interface>
+
+    <bpmn2:interface id="_Interface_FulfillmentService"
+                     name="com.marketplace.checkout.service.FulfillmentService"
+                     implementationRef="com.marketplace.checkout.service.FulfillmentService">
+        <bpmn2:operation id="_Op_ConfirmOrder" name="confirmOrderAndShip" implementationRef="confirmOrderAndShip">
+            <bpmn2:inMessageRef>_Msg_ConfirmOrder_In</bpmn2:inMessageRef>
+            <bpmn2:outMessageRef>_Msg_ConfirmOrder_Out</bpmn2:outMessageRef>
+        </bpmn2:operation>
+        <bpmn2:operation id="_Op_NotifyRejection" name="notifyRejection" implementationRef="notifyRejection">
+            <bpmn2:inMessageRef>_Msg_NotifyRejection_In</bpmn2:inMessageRef>
+            <bpmn2:outMessageRef>_Msg_NotifyRejection_Out</bpmn2:outMessageRef>
+        </bpmn2:operation>
+    </bpmn2:interface>
+
+    <bpmn2:process id="checkout"
+                   name="Marketplace Checkout Process"
+                   isExecutable="true"
+                   processType="Public"
+                   drools:packageName="com.marketplace.checkout"
+                   drools:version="1.0">
+
+        <bpmn2:property id="order" itemSubjectRef="_orderItem" name="order"/>
+
+        <bpmn2:startEvent id="StartEvent_Checkout" name="Checkout Requested">
+            <bpmn2:outgoing>Flow_Start_To_ReserveStock</bpmn2:outgoing>
+        </bpmn2:startEvent>
+
+        <bpmn2:serviceTask id="Task_ReserveStock"
+                           name="Validate and Reserve Stock"
+                           implementation="Java"
+                           operationRef="_Op_ReserveStock"
+                           drools:serviceimplementation="Java"
+                           drools:serviceinterface="com.marketplace.checkout.service.InventoryService"
+                           drools:serviceoperation="reserveStock">
+            <bpmn2:incoming>Flow_Start_To_ReserveStock</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_ReserveStock_To_GatewayStock</bpmn2:outgoing>
+            <bpmn2:ioSpecification id="_IoSpec_ReserveStock">
+                <bpmn2:dataInput id="_Input_ReserveStock" drools:dtype="com.marketplace.checkout.model.CheckoutOrder" itemSubjectRef="_ReserveStock_ParamItem" name="Parameter"/>
+                <bpmn2:dataOutput id="_Output_ReserveStock" drools:dtype="com.marketplace.checkout.model.CheckoutOrder" itemSubjectRef="_ReserveStock_ResultItem" name="Result"/>
+                <bpmn2:inputSet id="_InputSet_ReserveStock">
+                    <bpmn2:dataInputRefs>_Input_ReserveStock</bpmn2:dataInputRefs>
+                </bpmn2:inputSet>
+                <bpmn2:outputSet id="_OutputSet_ReserveStock">
+                    <bpmn2:dataOutputRefs>_Output_ReserveStock</bpmn2:dataOutputRefs>
+                </bpmn2:outputSet>
+            </bpmn2:ioSpecification>
+            <bpmn2:dataInputAssociation id="_DataInAssoc_ReserveStock">
+                <bpmn2:sourceRef>order</bpmn2:sourceRef>
+                <bpmn2:targetRef>_Input_ReserveStock</bpmn2:targetRef>
+            </bpmn2:dataInputAssociation>
+            <bpmn2:dataOutputAssociation id="_DataOutAssoc_ReserveStock">
+                <bpmn2:sourceRef>_Output_ReserveStock</bpmn2:sourceRef>
+                <bpmn2:targetRef>order</bpmn2:targetRef>
+            </bpmn2:dataOutputAssociation>
+        </bpmn2:serviceTask>
+
+        <bpmn2:exclusiveGateway id="Gateway_StockCheck" name="Stock Available?" gatewayDirection="Diverging">
+            <bpmn2:incoming>Flow_ReserveStock_To_GatewayStock</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_StockAvailable_Yes</bpmn2:outgoing>
+            <bpmn2:outgoing>Flow_StockAvailable_No</bpmn2:outgoing>
+        </bpmn2:exclusiveGateway>
+
+        <bpmn2:serviceTask id="Task_NotifyOutOfStock"
+                           name="Notify Out of Stock"
+                           implementation="Java"
+                           operationRef="_Op_NotifyRejection"
+                           drools:serviceimplementation="Java"
+                           drools:serviceinterface="com.marketplace.checkout.service.FulfillmentService"
+                           drools:serviceoperation="notifyRejection">
+            <bpmn2:incoming>Flow_StockAvailable_No</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_NotifyOutOfStock_To_End</bpmn2:outgoing>
+            <bpmn2:ioSpecification id="_IoSpec_NotifyOutOfStock">
+                <bpmn2:dataInput id="_Input_NotifyOutOfStock" drools:dtype="com.marketplace.checkout.model.CheckoutOrder" itemSubjectRef="_NotifyOutOfStock_ParamItem" name="Parameter"/>
+                <bpmn2:dataOutput id="_Output_NotifyOutOfStock" drools:dtype="com.marketplace.checkout.model.CheckoutOrder" itemSubjectRef="_NotifyOutOfStock_ResultItem" name="Result"/>
+                <bpmn2:inputSet id="_InputSet_NotifyOutOfStock">
+                    <bpmn2:dataInputRefs>_Input_NotifyOutOfStock</bpmn2:dataInputRefs>
+                </bpmn2:inputSet>
+                <bpmn2:outputSet id="_OutputSet_NotifyOutOfStock">
+                    <bpmn2:dataOutputRefs>_Output_NotifyOutOfStock</bpmn2:dataOutputRefs>
+                </bpmn2:outputSet>
+            </bpmn2:ioSpecification>
+            <bpmn2:dataInputAssociation id="_DataInAssoc_NotifyOutOfStock">
+                <bpmn2:sourceRef>order</bpmn2:sourceRef>
+                <bpmn2:targetRef>_Input_NotifyOutOfStock</bpmn2:targetRef>
+            </bpmn2:dataInputAssociation>
+            <bpmn2:dataOutputAssociation id="_DataOutAssoc_NotifyOutOfStock">
+                <bpmn2:sourceRef>_Output_NotifyOutOfStock</bpmn2:sourceRef>
+                <bpmn2:targetRef>order</bpmn2:targetRef>
+            </bpmn2:dataOutputAssociation>
+        </bpmn2:serviceTask>
+
+        <bpmn2:endEvent id="EndEvent_OutOfStock" name="Rejected - Out of Stock">
+            <bpmn2:incoming>Flow_NotifyOutOfStock_To_End</bpmn2:incoming>
+        </bpmn2:endEvent>
+
+        <bpmn2:serviceTask id="Task_CalculatePricing"
+                           name="Calculate Pricing and Promo"
+                           implementation="Java"
+                           operationRef="_Op_CalculatePricing"
+                           drools:serviceimplementation="Java"
+                           drools:serviceinterface="com.marketplace.checkout.service.PricingService"
+                           drools:serviceoperation="calculatePricing">
+            <bpmn2:incoming>Flow_StockAvailable_Yes</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_Pricing_To_Payment</bpmn2:outgoing>
+            <bpmn2:ioSpecification id="_IoSpec_CalculatePricing">
+                <bpmn2:dataInput id="_Input_CalculatePricing" drools:dtype="com.marketplace.checkout.model.CheckoutOrder" itemSubjectRef="_CalculatePricing_ParamItem" name="Parameter"/>
+                <bpmn2:dataOutput id="_Output_CalculatePricing" drools:dtype="com.marketplace.checkout.model.CheckoutOrder" itemSubjectRef="_CalculatePricing_ResultItem" name="Result"/>
+                <bpmn2:inputSet id="_InputSet_CalculatePricing">
+                    <bpmn2:dataInputRefs>_Input_CalculatePricing</bpmn2:dataInputRefs>
+                </bpmn2:inputSet>
+                <bpmn2:outputSet id="_OutputSet_CalculatePricing">
+                    <bpmn2:dataOutputRefs>_Output_CalculatePricing</bpmn2:dataOutputRefs>
+                </bpmn2:outputSet>
+            </bpmn2:ioSpecification>
+            <bpmn2:dataInputAssociation id="_DataInAssoc_CalculatePricing">
+                <bpmn2:sourceRef>order</bpmn2:sourceRef>
+                <bpmn2:targetRef>_Input_CalculatePricing</bpmn2:targetRef>
+            </bpmn2:dataInputAssociation>
+            <bpmn2:dataOutputAssociation id="_DataOutAssoc_CalculatePricing">
+                <bpmn2:sourceRef>_Output_CalculatePricing</bpmn2:sourceRef>
+                <bpmn2:targetRef>order</bpmn2:targetRef>
+            </bpmn2:dataOutputAssociation>
+        </bpmn2:serviceTask>
+
+        <bpmn2:serviceTask id="Task_ProcessPayment"
+                           name="Process Payment"
+                           implementation="Java"
+                           operationRef="_Op_ProcessPayment"
+                           drools:serviceimplementation="Java"
+                           drools:serviceinterface="com.marketplace.checkout.service.PaymentService"
+                           drools:serviceoperation="processPayment">
+            <bpmn2:incoming>Flow_Pricing_To_Payment</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_Payment_To_GatewayPayment</bpmn2:outgoing>
+            <bpmn2:ioSpecification id="_IoSpec_ProcessPayment">
+                <bpmn2:dataInput id="_Input_ProcessPayment" drools:dtype="com.marketplace.checkout.model.CheckoutOrder" itemSubjectRef="_ProcessPayment_ParamItem" name="Parameter"/>
+                <bpmn2:dataOutput id="_Output_ProcessPayment" drools:dtype="com.marketplace.checkout.model.CheckoutOrder" itemSubjectRef="_ProcessPayment_ResultItem" name="Result"/>
+                <bpmn2:inputSet id="_InputSet_ProcessPayment">
+                    <bpmn2:dataInputRefs>_Input_ProcessPayment</bpmn2:dataInputRefs>
+                </bpmn2:inputSet>
+                <bpmn2:outputSet id="_OutputSet_ProcessPayment">
+                    <bpmn2:dataOutputRefs>_Output_ProcessPayment</bpmn2:dataOutputRefs>
+                </bpmn2:outputSet>
+            </bpmn2:ioSpecification>
+            <bpmn2:dataInputAssociation id="_DataInAssoc_ProcessPayment">
+                <bpmn2:sourceRef>order</bpmn2:sourceRef>
+                <bpmn2:targetRef>_Input_ProcessPayment</bpmn2:targetRef>
+            </bpmn2:dataInputAssociation>
+            <bpmn2:dataOutputAssociation id="_DataOutAssoc_ProcessPayment">
+                <bpmn2:sourceRef>_Output_ProcessPayment</bpmn2:sourceRef>
+                <bpmn2:targetRef>order</bpmn2:targetRef>
+            </bpmn2:dataOutputAssociation>
+        </bpmn2:serviceTask>
+
+        <bpmn2:exclusiveGateway id="Gateway_PaymentCheck" name="Payment Successful?" gatewayDirection="Diverging">
+            <bpmn2:incoming>Flow_Payment_To_GatewayPayment</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_PaymentSuccess_Yes</bpmn2:outgoing>
+            <bpmn2:outgoing>Flow_PaymentSuccess_No</bpmn2:outgoing>
+        </bpmn2:exclusiveGateway>
+
+        <bpmn2:serviceTask id="Task_ConfirmOrder"
+                           name="Confirm Order and Schedule Shipping"
+                           implementation="Java"
+                           operationRef="_Op_ConfirmOrder"
+                           drools:serviceimplementation="Java"
+                           drools:serviceinterface="com.marketplace.checkout.service.FulfillmentService"
+                           drools:serviceoperation="confirmOrderAndShip">
+            <bpmn2:incoming>Flow_PaymentSuccess_Yes</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_ConfirmOrder_To_EndCompleted</bpmn2:outgoing>
+            <bpmn2:ioSpecification id="_IoSpec_ConfirmOrder">
+                <bpmn2:dataInput id="_Input_ConfirmOrder" drools:dtype="com.marketplace.checkout.model.CheckoutOrder" itemSubjectRef="_ConfirmOrder_ParamItem" name="Parameter"/>
+                <bpmn2:dataOutput id="_Output_ConfirmOrder" drools:dtype="com.marketplace.checkout.model.CheckoutOrder" itemSubjectRef="_ConfirmOrder_ResultItem" name="Result"/>
+                <bpmn2:inputSet id="_InputSet_ConfirmOrder">
+                    <bpmn2:dataInputRefs>_Input_ConfirmOrder</bpmn2:dataInputRefs>
+                </bpmn2:inputSet>
+                <bpmn2:outputSet id="_OutputSet_ConfirmOrder">
+                    <bpmn2:dataOutputRefs>_Output_ConfirmOrder</bpmn2:dataOutputRefs>
+                </bpmn2:outputSet>
+            </bpmn2:ioSpecification>
+            <bpmn2:dataInputAssociation id="_DataInAssoc_ConfirmOrder">
+                <bpmn2:sourceRef>order</bpmn2:sourceRef>
+                <bpmn2:targetRef>_Input_ConfirmOrder</bpmn2:targetRef>
+            </bpmn2:dataInputAssociation>
+            <bpmn2:dataOutputAssociation id="_DataOutAssoc_ConfirmOrder">
+                <bpmn2:sourceRef>_Output_ConfirmOrder</bpmn2:sourceRef>
+                <bpmn2:targetRef>order</bpmn2:targetRef>
+            </bpmn2:dataOutputAssociation>
+        </bpmn2:serviceTask>
+
+        <bpmn2:endEvent id="EndEvent_Completed" name="Checkout Completed">
+            <bpmn2:incoming>Flow_ConfirmOrder_To_EndCompleted</bpmn2:incoming>
+        </bpmn2:endEvent>
+
+        <bpmn2:serviceTask id="Task_ReleaseStock"
+                           name="Release Reserved Stock"
+                           implementation="Java"
+                           operationRef="_Op_ReleaseStock"
+                           drools:serviceimplementation="Java"
+                           drools:serviceinterface="com.marketplace.checkout.service.InventoryService"
+                           drools:serviceoperation="releaseStock">
+            <bpmn2:incoming>Flow_PaymentSuccess_No</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_ReleaseStock_To_NotifyFailed</bpmn2:outgoing>
+            <bpmn2:ioSpecification id="_IoSpec_ReleaseStock">
+                <bpmn2:dataInput id="_Input_ReleaseStock" drools:dtype="com.marketplace.checkout.model.CheckoutOrder" itemSubjectRef="_ReleaseStock_ParamItem" name="Parameter"/>
+                <bpmn2:dataOutput id="_Output_ReleaseStock" drools:dtype="com.marketplace.checkout.model.CheckoutOrder" itemSubjectRef="_ReleaseStock_ResultItem" name="Result"/>
+                <bpmn2:inputSet id="_InputSet_ReleaseStock">
+                    <bpmn2:dataInputRefs>_Input_ReleaseStock</bpmn2:dataInputRefs>
+                </bpmn2:inputSet>
+                <bpmn2:outputSet id="_OutputSet_ReleaseStock">
+                    <bpmn2:dataOutputRefs>_Output_ReleaseStock</bpmn2:dataOutputRefs>
+                </bpmn2:outputSet>
+            </bpmn2:ioSpecification>
+            <bpmn2:dataInputAssociation id="_DataInAssoc_ReleaseStock">
+                <bpmn2:sourceRef>order</bpmn2:sourceRef>
+                <bpmn2:targetRef>_Input_ReleaseStock</bpmn2:targetRef>
+            </bpmn2:dataInputAssociation>
+            <bpmn2:dataOutputAssociation id="_DataOutAssoc_ReleaseStock">
+                <bpmn2:sourceRef>_Output_ReleaseStock</bpmn2:sourceRef>
+                <bpmn2:targetRef>order</bpmn2:targetRef>
+            </bpmn2:dataOutputAssociation>
+        </bpmn2:serviceTask>
+
+        <bpmn2:serviceTask id="Task_NotifyPaymentFailed"
+                           name="Notify Payment Failed"
+                           implementation="Java"
+                           operationRef="_Op_NotifyRejection"
+                           drools:serviceimplementation="Java"
+                           drools:serviceinterface="com.marketplace.checkout.service.FulfillmentService"
+                           drools:serviceoperation="notifyRejection">
+            <bpmn2:incoming>Flow_ReleaseStock_To_NotifyFailed</bpmn2:incoming>
+            <bpmn2:outgoing>Flow_NotifyPaymentFailed_To_End</bpmn2:outgoing>
+            <bpmn2:ioSpecification id="_IoSpec_NotifyPaymentFailed">
+                <bpmn2:dataInput id="_Input_NotifyPaymentFailed" drools:dtype="com.marketplace.checkout.model.CheckoutOrder" itemSubjectRef="_NotifyPaymentFailed_ParamItem" name="Parameter"/>
+                <bpmn2:dataOutput id="_Output_NotifyPaymentFailed" drools:dtype="com.marketplace.checkout.model.CheckoutOrder" itemSubjectRef="_NotifyPaymentFailed_ResultItem" name="Result"/>
+                <bpmn2:inputSet id="_InputSet_NotifyPaymentFailed">
+                    <bpmn2:dataInputRefs>_Input_NotifyPaymentFailed</bpmn2:dataInputRefs>
+                </bpmn2:inputSet>
+                <bpmn2:outputSet id="_OutputSet_NotifyPaymentFailed">
+                    <bpmn2:dataOutputRefs>_Output_NotifyPaymentFailed</bpmn2:dataOutputRefs>
+                </bpmn2:outputSet>
+            </bpmn2:ioSpecification>
+            <bpmn2:dataInputAssociation id="_DataInAssoc_NotifyPaymentFailed">
+                <bpmn2:sourceRef>order</bpmn2:sourceRef>
+                <bpmn2:targetRef>_Input_NotifyPaymentFailed</bpmn2:targetRef>
+            </bpmn2:dataInputAssociation>
+            <bpmn2:dataOutputAssociation id="_DataOutAssoc_NotifyPaymentFailed">
+                <bpmn2:sourceRef>_Output_NotifyPaymentFailed</bpmn2:sourceRef>
+                <bpmn2:targetRef>order</bpmn2:targetRef>
+            </bpmn2:dataOutputAssociation>
+        </bpmn2:serviceTask>
+
+        <bpmn2:endEvent id="EndEvent_PaymentFailed" name="Rejected - Payment Failed">
+            <bpmn2:incoming>Flow_NotifyPaymentFailed_To_End</bpmn2:incoming>
+        </bpmn2:endEvent>
+
+        <bpmn2:sequenceFlow id="Flow_Start_To_ReserveStock" sourceRef="StartEvent_Checkout" targetRef="Task_ReserveStock"/>
+        <bpmn2:sequenceFlow id="Flow_ReserveStock_To_GatewayStock" sourceRef="Task_ReserveStock" targetRef="Gateway_StockCheck"/>
+
+        <bpmn2:sequenceFlow id="Flow_StockAvailable_Yes" name="In Stock" sourceRef="Gateway_StockCheck" targetRef="Task_CalculatePricing">
+            <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="http://www.java.com/java">return order.isStockAvailable();</bpmn2:conditionExpression>
+        </bpmn2:sequenceFlow>
+
+        <bpmn2:sequenceFlow id="Flow_StockAvailable_No" name="Out of Stock" sourceRef="Gateway_StockCheck" targetRef="Task_NotifyOutOfStock">
+            <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="http://www.java.com/java">return !order.isStockAvailable();</bpmn2:conditionExpression>
+        </bpmn2:sequenceFlow>
+
+        <bpmn2:sequenceFlow id="Flow_NotifyOutOfStock_To_End" sourceRef="Task_NotifyOutOfStock" targetRef="EndEvent_OutOfStock"/>
+        <bpmn2:sequenceFlow id="Flow_Pricing_To_Payment" sourceRef="Task_CalculatePricing" targetRef="Task_ProcessPayment"/>
+        <bpmn2:sequenceFlow id="Flow_Payment_To_GatewayPayment" sourceRef="Task_ProcessPayment" targetRef="Gateway_PaymentCheck"/>
+
+        <bpmn2:sequenceFlow id="Flow_PaymentSuccess_Yes" name="Paid" sourceRef="Gateway_PaymentCheck" targetRef="Task_ConfirmOrder">
+            <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="http://www.java.com/java">return order.isPaymentSuccess();</bpmn2:conditionExpression>
+        </bpmn2:sequenceFlow>
+
+        <bpmn2:sequenceFlow id="Flow_PaymentSuccess_No" name="Declined" sourceRef="Gateway_PaymentCheck" targetRef="Task_ReleaseStock">
+            <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="http://www.java.com/java">return !order.isPaymentSuccess();</bpmn2:conditionExpression>
+        </bpmn2:sequenceFlow>
+
+        <bpmn2:sequenceFlow id="Flow_ConfirmOrder_To_EndCompleted" sourceRef="Task_ConfirmOrder" targetRef="EndEvent_Completed"/>
+        <bpmn2:sequenceFlow id="Flow_ReleaseStock_To_NotifyFailed" sourceRef="Task_ReleaseStock" targetRef="Task_NotifyPaymentFailed"/>
+        <bpmn2:sequenceFlow id="Flow_NotifyPaymentFailed_To_End" sourceRef="Task_NotifyPaymentFailed" targetRef="EndEvent_PaymentFailed"/>
+
+    </bpmn2:process>
+
+    <bpmndi:BPMNDiagram id="BPMNDiagram_Checkout">
+        <bpmndi:BPMNPlane id="BPMNPlane_Checkout" bpmnElement="checkout">
+            <bpmndi:BPMNShape id="Shape_StartEvent_Checkout" bpmnElement="StartEvent_Checkout">
+                <dc:Bounds x="80" y="162" width="36" height="36"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Shape_Task_ReserveStock" bpmnElement="Task_ReserveStock">
+                <dc:Bounds x="170" y="140" width="140" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Shape_Gateway_StockCheck" bpmnElement="Gateway_StockCheck" isMarkerVisible="true">
+                <dc:Bounds x="365" y="155" width="50" height="50"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Shape_Task_NotifyOutOfStock" bpmnElement="Task_NotifyOutOfStock">
+                <dc:Bounds x="470" y="300" width="140" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Shape_EndEvent_OutOfStock" bpmnElement="EndEvent_OutOfStock">
+                <dc:Bounds x="670" y="322" width="36" height="36"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Shape_Task_CalculatePricing" bpmnElement="Task_CalculatePricing">
+                <dc:Bounds x="470" y="140" width="140" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Shape_Task_ProcessPayment" bpmnElement="Task_ProcessPayment">
+                <dc:Bounds x="670" y="140" width="140" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Shape_Gateway_PaymentCheck" bpmnElement="Gateway_PaymentCheck" isMarkerVisible="true">
+                <dc:Bounds x="865" y="155" width="50" height="50"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Shape_Task_ConfirmOrder" bpmnElement="Task_ConfirmOrder">
+                <dc:Bounds x="975" y="140" width="150" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Shape_EndEvent_Completed" bpmnElement="EndEvent_Completed">
+                <dc:Bounds x="1185" y="162" width="36" height="36"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Shape_Task_ReleaseStock" bpmnElement="Task_ReleaseStock">
+                <dc:Bounds x="975" y="300" width="150" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Shape_Task_NotifyPaymentFailed" bpmnElement="Task_NotifyPaymentFailed">
+                <dc:Bounds x="1185" y="300" width="150" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Shape_EndEvent_PaymentFailed" bpmnElement="EndEvent_PaymentFailed">
+                <dc:Bounds x="1395" y="322" width="36" height="36"/>
+            </bpmndi:BPMNShape>
+
+            <bpmndi:BPMNEdge id="Edge_Flow_Start_To_ReserveStock" bpmnElement="Flow_Start_To_ReserveStock">
+                <di:waypoint x="116" y="180"/>
+                <di:waypoint x="170" y="180"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Edge_Flow_ReserveStock_To_GatewayStock" bpmnElement="Flow_ReserveStock_To_GatewayStock">
+                <di:waypoint x="310" y="180"/>
+                <di:waypoint x="365" y="180"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Edge_Flow_StockAvailable_Yes" bpmnElement="Flow_StockAvailable_Yes">
+                <di:waypoint x="415" y="180"/>
+                <di:waypoint x="470" y="180"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Edge_Flow_StockAvailable_No" bpmnElement="Flow_StockAvailable_No">
+                <di:waypoint x="390" y="205"/>
+                <di:waypoint x="390" y="340"/>
+                <di:waypoint x="470" y="340"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Edge_Flow_NotifyOutOfStock_To_End" bpmnElement="Flow_NotifyOutOfStock_To_End">
+                <di:waypoint x="610" y="340"/>
+                <di:waypoint x="670" y="340"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Edge_Flow_Pricing_To_Payment" bpmnElement="Flow_Pricing_To_Payment">
+                <di:waypoint x="610" y="180"/>
+                <di:waypoint x="670" y="180"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Edge_Flow_Payment_To_GatewayPayment" bpmnElement="Flow_Payment_To_GatewayPayment">
+                <di:waypoint x="810" y="180"/>
+                <di:waypoint x="865" y="180"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Edge_Flow_PaymentSuccess_Yes" bpmnElement="Flow_PaymentSuccess_Yes">
+                <di:waypoint x="915" y="180"/>
+                <di:waypoint x="975" y="180"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Edge_Flow_PaymentSuccess_No" bpmnElement="Flow_PaymentSuccess_No">
+                <di:waypoint x="890" y="205"/>
+                <di:waypoint x="890" y="340"/>
+                <di:waypoint x="975" y="340"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Edge_Flow_ConfirmOrder_To_EndCompleted" bpmnElement="Flow_ConfirmOrder_To_EndCompleted">
+                <di:waypoint x="1125" y="180"/>
+                <di:waypoint x="1185" y="180"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Edge_Flow_ReleaseStock_To_NotifyFailed" bpmnElement="Flow_ReleaseStock_To_NotifyFailed">
+                <di:waypoint x="1125" y="340"/>
+                <di:waypoint x="1185" y="340"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Edge_Flow_NotifyPaymentFailed_To_End" bpmnElement="Flow_NotifyPaymentFailed_To_End">
+                <di:waypoint x="1335" y="340"/>
+                <di:waypoint x="1395" y="340"/>
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+
+</bpmn2:definitions>
+
